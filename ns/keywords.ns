@@ -1,0 +1,43 @@
+!nslang(version=1.0)
+
+_def label _label
+_def goto _goto
+_def true _TRUE
+_def false _FALSE
+_def &name({#list})(as a) a.call({#list})
+
+define if(#variable->ifload[1]){#code->ifcode}\
+    _if (#ifload[0])
+        @do #ifcode
+end
+define elif(#variable->elifload[1]){#code->elseifcode}\
+    _if (#elifload[0])
+        @do #elseifcode
+end
+define else{#code->elsecode}
+    _if (exist #ifload)
+        _if (not #ifload[0])
+            @do #elsecode
+    _if (exist #elifload)
+        _if (not #elifload[0])
+            @do #elsecode
+end
+
+define for #name->iterator : #variable->container{#code->docode}
+    @register #iterator as i
+    @var i = #container.first()
+    label a:
+    @do #docode
+    try {
+        @i = #container.next()
+        goto a
+    }
+end
+
+define while(#variable->whenwhile[1]){#code->whilecode}\
+    label a:
+    if (!#whenwhile[0])
+        @end
+    @do #whilecode
+    goto a
+end

@@ -1,0 +1,17 @@
+!nslang(version=1.0)
+
+import running
+import types
+import time
+
+var funclist = list()
+
+var getnow = function<>, {
+    document<
+        --description Test function.
+        --relates time.now
+    > d
+    return str(time.now())
+} -> funclist
+
+running.module <- funclist

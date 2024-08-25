@@ -1,0 +1,105 @@
+!nslang(version=1.0)
+document <
+    --file main.ns
+    --description Test file of nslang.
+    --author distjr_
+    --date 2024-06-21
+    --version 1.0
+> d
+
+import running
+import base
+import io
+import fileio
+import error
+import module
+
+// Comment.
+comment
+Comment Block.
+end
+
+define switch(#variable->svar[1]){#code->scode}
+    @do #scode
+enddef
+
+define case #variable->cvar[1]:#code->ccode
+    if (not exist #svar)
+        raise error.GrammarError("Keyword \"case\" appeared outside the switch box.") as error.fatal
+    else {
+        try
+            @elif (#svar[0] == #cvar[0]) do #ccode
+        except error.GrammarError
+            @if (#svar[0] == #cvar[0]) do #ccode
+    }
+enddef
+
+define default:#code->dcode
+    if (not exist #svar)
+        raise error.GrammarError("Keyword \"default\" appeared outside the switch box.") as error.fatal
+    else
+        @else do #dcode
+enddef
+
+var mainname = namespace, self, {
+    var pi = int(3.14)
+    var S = function<r=>, {
+        return self::pi * r * r
+    }
+    var isPositive = function<num=>, {
+        document <
+            --description It does what you think it does.
+            --param num You know what it is.
+            --return
+                -true when num > 0
+                -false when num < 0
+        > d
+        return num > 0
+    }
+}
+
+var Runclass = class<object>, self, {
+    var _init = function<self=,ktet=0>, self.ktet = ktet
+    var _echo = function<self=>, return str(self.ktet)
+}
+
+var addOne = function<lst=>, {
+    for i : lst
+        yield i + 1
+}
+
+var main = function<inc=>, {
+    document <
+        --description Main function.
+        --param inc Input data.
+        --exception error.FileNotFoundError will raised when the program can't find main.in.
+    > d
+    var fi = fileio.open("main.in","r")
+    var fo = fileio.open("main.out","w")
+    io.print("hello, world!")
+    var sstr = int(io.input())
+    var k = list()
+    for i : base.range(sstr)
+        k.append(int(io.input("%d" % (i))))
+    for i : addOne(k)
+        io.print(i)
+    if (exist inc)
+        io.print(inc)
+    else
+        io.print("Int not Exist! %d" % (mainname::S(sstr)))
+    switch (sstr) {
+        case 1: io.print("1")
+        case 2: io.print("2")
+        default: io.print("NO")
+    }
+    io.print(module.getnow())
+    io.print(Runclass(ktet=23))
+    do
+    {
+        io.print(notExistVariable)
+    } asif (exist notExistVariable)
+    fi.close(), fo.close()
+    return 0
+}
+
+running.run <- main
