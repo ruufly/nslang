@@ -1,0 +1,35 @@
+{
+  "name": "nslang",
+  "displayName": "nslang",
+  "description": "Support of nslang",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.89.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "ns",
+        "aliases": [
+          "nslang",
+          "ns"
+        ],
+        "extensions": [
+          ".ns",
+          ".nsmod"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ns",
+        "scopeName": "grammar.ns",
+        "path": "./syntaxes/ns.tmLanguage.json"
+      }
+    ]
+  }
+}
