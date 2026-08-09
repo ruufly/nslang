@@ -1,0 +1,467 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "nslang",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#import"
+		},
+		{
+			"include": "#markup"
+		},
+		{
+			"include": "#storage"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#support"
+		},
+		{
+			"include": "#comment"
+		},
+		{
+			"include": "#statements"
+		},
+		{
+			"include": "#constant"
+		},
+		{
+			"include": "#entity"
+		},
+		{
+			"include": "#variable"
+		},
+		{
+			"include": "#number"
+		},
+		{
+			"include": "#operator"
+		}
+	],
+	"repository": {
+		"code": {
+			"patterns": [
+				{
+					"include": "#keywords"
+				},
+				{
+					"include": "#import"
+				},
+				{
+					"include": "#markup"
+				},
+				{
+					"include": "#storage"
+				},
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#support"
+				},
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#statements"
+				},
+				{
+					"include": "#constant"
+				},
+				{
+					"include": "#entity"
+				},
+				{
+					"include": "#variable"
+				},
+				{
+					"include": "#number"
+				},
+				{
+					"include": "#operator"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.ns",
+					"match": "\\b(if|else|elif|asif|disable|while|for|return|and|or|not|import|register|try|except|do|pass|exist|raise|enddef|var|label|goto|delete|as|comment|endcomment|yield|end|namespace)\\b"
+				},
+				{
+					"name": "keyword.control.ns",
+					"match": "^define"
+				},
+				{
+					"name": "keyword.other.ns",
+					"match": "(#|->|<-)"
+				},
+				{
+					"name": "keyword.control.less.ns",
+					"match": "\\b(function|class)\\b"
+				},
+				{
+					"name": "keyword.ns",
+					"start": "define",
+					"end": "(enddef|end)",
+					"patterns": [
+						{
+							"name": "keyword.other.ns",
+							"match": "(@)"
+						}
+					]
+				}
+			]
+		},
+		"import": {
+			"patterns": [
+				{
+					"begin": "\\b(?<!\\.)(from)\\b(?=.+import)",
+					"end": "$|(?=import)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.control.import.ns"
+						}
+					},
+					"patterns": [
+						{
+							"name": "punctuation.separator.period.ns",
+							"match": "\\.+"
+						},
+						{
+							"include": "#expression"
+						}
+					]
+				},
+				{
+					"begin": "\\b(?<!\\.)(import)\\b",
+					"end": "$",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.control.import.ns"
+						}
+					},
+					"patterns": [
+						{
+							"name": "keyword.control.import.ns",
+							"match": "\\b(?<!\\.)as\\b"
+						},
+						{
+							"include": "#expression"
+						}
+					]
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"name": "string.quoted.double.ns",
+					"begin": "\"",
+					"end": "\"",
+					"patterns": [
+						{
+							"name": "constant.character.escape.ns",
+							"match": "\\\\."
+						}
+					]
+				}
+			]
+		},
+		"support": {
+			"patterns": [
+				{
+					"name": "support.class.ns",
+					"match": "\\b(object|int|str|list|float|dict)\\b"
+				}
+			]
+		},
+		"comment": {
+			"patterns": [
+				{
+					"begin": "(?<=\\bcomment)",
+					"end": "(?=^(endcomment|end))",
+					"name": "comment.block.documentation.ns"
+				},
+				{
+					"begin": "\\b(d|document)\\s*<",
+					"end": ">\\s*(d|document)",
+					"name": "comment.block.documentation.ns",
+					"patterns": [
+						{
+							"match": "\\-\\-(param|description|date|author|version|module|return|note|exception|relates|code|endcode|file|email|license)\\b",
+							"name": "storage.type.class.doxygen.ns"
+						},
+						{
+							"match": "(?<=\\-\\-param)\\s+[A-Za-z0-9_]*",
+							"name": "variable.parameter.ns"
+						},
+						{
+							"match": "(?<=\\-\\-version)\\s+.*$",
+							"name": "constant.numeric.ns"
+						},
+						{
+							"match": "(?<=\\-\\-date)\\s+.*$",
+							"name": "constant.numeric.ns"
+						},
+						{
+							"match": "(?<=\\-\\-author)\\s+.*$",
+							"name": "string.ns"
+						},
+						{
+							"match": "(?<=\\-\\-exception)\\s+[A-Za-z0-9_\\.]*",
+							"name": "entity.name.class.ns"
+						},
+						{
+							"match": "(?<=\\-\\-relates)\\s+.*$",
+							"name": "entity.name.function.ns"
+						},
+						{
+							"match": "(?<=\\-\\-code)[\\s\\S]*(?=\\-\\-endcode)",
+							"patterns": [
+								{
+									"include": "#code"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "comment.line.double-slash.ns",
+					"match": "//.{0,}$"
+				}
+			]
+		},
+		"statements": {
+			"patterns": [
+				{
+					"match": "(?<=function\\s*)<([A-Za-z0-9=,\\s\\S]*)>",
+					"captures": {
+						"1": {
+							"patterns": [
+								{
+									"match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b(?=(,|=|\\>))",
+									"name": "variable.parameter.ns"
+								},
+								{
+									"include": "#paralist"
+								}
+							]
+						}
+					}
+				},
+				{
+					"match": "(?<=\\!nslang\\s*)\\(([A-Za-z0-9=,\\s\\S]*)\\)",
+					"captures": {
+						"1": {
+							"patterns": [
+								{
+									"match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b(?=(,|=|\\)))",
+									"name": "variable.parameter.ns"
+								},
+								{
+									"include": "#paralist"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"paralist":
+		{
+			"patterns": [
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#constant"
+				},
+				{
+					"include": "#number"
+				}
+			]
+		},
+		"constant": {
+			"name": "constant.ns",
+			"patterns": [
+				{
+					"name": "constant.language.ns",
+					"match": "\\b(true|false|null)\\b"
+				},
+				{
+					"name": "constant.character.ns",
+					"begin": "'",
+					"end": "'",
+					"patterns": [
+						{
+							"name": "constant.character.escape.ns",
+							"match": "\\\\."
+						}
+					]
+				}
+			]
+		},
+		"markup": {
+			"name": "markup.ns",
+			"patterns": [
+				{
+					"name": "markup.bold.ns",
+					"begin": "!",
+					"end": "$",
+					"match": "\\b(nslang)\\b"
+				}
+			]
+		},
+		"entity": {
+			"patterns": [
+				{
+					"name": "entity.name.function.ns",
+					"match": "(?<=var\\s*)\\s+[A-Za-z_][A-Za-z0-9_]*(?=\\s*=\\s*function)"
+				},
+				{
+					"name": "entity.name.function.ns",
+					"match": "(?<=^\\s*define\\s*)\\s+[A-Za-z_][A-Za-z0-9_]*"
+				},
+				{
+					"name": "invalid.illegal.ns",
+					"match": "(?<=var\\s*)\\s+self"
+				},
+				{
+					"name": "entity.name.class.ns",
+					"match": "(?<=var\\s*)\\s+[A-Za-z_][A-Za-z0-9_]*(?=\\s*=\\s*class)"
+				},
+				{
+					"name": "entity.name.function.ns",
+					"match": "[A-Za-z_][A-Za-z0-9_]*(?=\\([\\s\\S]*\\))"
+				},
+				{
+					"name": "storage.modifier.import.java.ns",
+					"match": "(?<=var\\s*)\\s+[A-Za-z_][A-Za-z0-9_]*(?=\\s*=\\s*namespace)"
+				},
+				{
+					"name": "storage.modifier.import.java.ns",
+					"match": "[A-Za-z_][A-Za-z0-9_]*(?=\\s*::)"
+				}
+			]
+		},
+		"variable": {
+			"patterns": [
+				{
+					"name": "variable.language.ns",
+					"match": "(?<=#)[A-Za-z_][A-Za-z0-9_]*"
+				},
+				{
+					"name": "variable.parameter.ns",
+					"match": "(?<=#[A-Za-z_][A-Za-z0-9_]*\\s*->\\s*)[A-Za-z_][A-Za-z0-9_]*"
+				},
+				{
+					"name": "variable.other.ns",
+					"match": "(?<=var\\s*)[A-Za-z_][A-Za-z0-9_]*"
+				}
+			]
+		},
+		"storage": {
+			"patterns": [
+				{
+					"name": "storage.modifier.import.java.ns",
+					"match": "(?<=import\\s*)[A-Za-z_][A-Za-z0-9_]*"
+				}
+			]
+		},
+		"number": {
+			"name": "constant.numeric.ns",
+			"patterns": [
+				{
+					"name": "constant.numeric.float.ns",
+					"match": "(?x)\n  (?<! \\w)(?:\n    (?:\n      \\.[0-9](?: _?[0-9] )*\n      |\n      [0-9](?: _?[0-9] )* \\. [0-9](?: _?[0-9] )*\n      |\n      [0-9](?: _?[0-9] )* \\.\n    ) (?: [eE][+-]?[0-9](?: _?[0-9] )* )?\n    |\n    [0-9](?: _?[0-9] )* (?: [eE][+-]?[0-9](?: _?[0-9] )* )\n  )([jJ])?\\b\n",
+					"captures": {
+						"1": {
+							"name": "storage.type.imaginary.number.ns"
+						}
+					}
+				},
+				{
+					"name": "constant.numeric.dec.ns",
+					"match": "(?x)\n  (?<![\\w\\.])(?:\n      [1-9](?: _?[0-9] )*\n      |\n      0+\n      |\n      [0-9](?: _?[0-9] )* ([jJ])\n      |\n      0 ([0-9]+)(?![eE\\.])\n  )\\b\n",
+					"captures": {
+						"1": {
+							"name": "storage.type.imaginary.number.ns"
+						},
+						"2": {
+							"name": "invalid.illegal.dec.ns"
+						}
+					}
+				},
+				{
+					"name": "constant.numeric.hex.ns",
+					"match": "(?x)\n  (?<![\\w\\.])\n    (0[xX]) (_?[0-9a-fA-F])+\n  \\b\n",
+					"captures": {
+						"1": {
+							"name": "storage.type.number.ns"
+						}
+					}
+				},
+				{
+					"name": "constant.numeric.oct.ns",
+					"match": "(?x)\n  (?<![\\w\\.])\n    (0[oO]) (_?[0-7])+\n  \\b\n",
+					"captures": {
+						"1": {
+							"name": "storage.type.number.ns"
+						}
+					}
+				},
+				{
+					"name": "constant.numeric.bin.ns",
+					"match": "(?x)\n  (?<![\\w\\.])\n    (0[bB]) (_?[01])+\n  \\b\n",
+					"captures": {
+						"1": {
+							"name": "storage.type.number.ns"
+						}
+					}
+				},
+				{
+					"name": "constant.numeric.bin.ns",
+					"match": "(?x)\n  (?<![\\w\\.])\n    ([1-9][0-9]* | 0) ([lL])\n  \\b\n",
+					"captures": {
+						"2": {
+							"name": "storage.type.number.ns"
+						}
+					}
+				},
+				{
+					"name": "invalid.illegal.name.ns",
+					"match": "\\b[0-9]+\\w+"
+				}
+			]
+		},
+		"operator": {
+			"match": "(?x)\n    \\b(?<!\\.)\n      (?:\n        (and | or | not)                         (?# 1)\n        |\n        (for | if | else | await | (?:yield(?:\\s+from)?))  (?# 2)\n      )\n    (?!\\s*:)\\b\n\n    | (<< | >> | & | \\| | \\^ | ~)                          (?# 3)\n\n    | (\\*\\* | \\* | \\+ | - | % | // | / | @)                (?# 4)\n\n    | (!= | == | >= | <= | < | >)                          (?# 5)\n\n    | (:=)                                                 (?# 6)\n",
+			"captures": {
+				"1": {
+					"name": "keyword.operator.logical.ns"
+				},
+				"2": {
+					"name": "keyword.control.flow.ns"
+				},
+				"3": {
+					"name": "keyword.operator.bitwise.ns"
+				},
+				"4": {
+					"name": "keyword.operator.arithmetic.ns"
+				},
+				"5": {
+					"name": "keyword.operator.comparison.ns"
+				},
+				"6": {
+					"name": "keyword.operator.assignment.ns"
+				}
+			}
+		}
+	},
+	"scopeName": "grammar.ns"
+}
